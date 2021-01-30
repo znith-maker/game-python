@@ -1,0 +1,166 @@
+django-admin startproject project-name
+python3 manage.py runserver
+
+python3 manage.py startapp app-name
+
+#myapp/views.py
+from django.http import HttpResponse
+
+def index(request):
+	return HttpResponse("hello world!")
+
+>>touch . urls.py
+
+#myapp/urls.py
+
+from django.urls import path
+from . import views
+
+urlpatterns = [
+	path('', views.index)
+]
+
+#mysite/urls.py
+from django.urls import path,include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('products/', include('myapp.urls'))
+]
+*************************************************************************
+***new app///
+myapp/views.py-->
+def new(request):
+	return HttpResponse('new page')
+myapp/urls.py-->
+urlpatterns = [
+	path('', views.index),
+	path('new', views.new),
+]
+*************************************************************************
+#myapp/models.py
+from django.db import models
+
+
+class Myapp(models.Model):
+	name = models.CharField(max_length=255)
+	price = models.FloatField()
+	stock = models.IntegerField()
+	image = models.CharField(max_length=2083)
+
+#mysite/settings.py
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'myapp.apps.MyappConfig'
+
+]
+>>python3 manage.py makemigrations
+>>python3 manage.py migrate
+>>python3 manage.py createsuperuser
+
+#myapp/admin.py
+from .models import Myapp
+
+class MyappAdmin(admin.ModelAdmin):
+	list_display = ('name', 'price','stock')
+
+
+admin.site.register(Myapp, MyappAdmin)
+
+#myapp/views.py
+def index(request):
+	products = Myapp.objects.all()
+	return render(request, 'index.html', {'products': products})
+
+#index.html
+{% extends 'base.html' %}
+
+
+{% block content %}
+	<h1>Products</h1>
+	<div class="row">
+		{% for product in products %}
+		<div class="col">
+			<div class="card shadow" style="width: 20rem;">
+  <img  src="bg.png" class="card-img-top"  alt="...">
+  <div class="card-body justify-content-center">
+    <h5 class="card-title">{{ product.name }}</h5>
+    <p class="card-text">{{ product.price }}</p>
+    <a href="#" class="btn btn-primary">Add to Cart</a>
+  </div>
+</div>
+		</div>
+		{% endfor %}
+	</div>
+	
+{% endblock %}
+
+
+
+#base.html 
+
+!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+
+    <title>Hello, world!</title>
+  </head>
+  <body>
+    <!-- As a link -->
+<nav class="navbar navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Navbar</a>
+  </div>
+</nav>
+
+<!-- As a heading -->
+<nav class="navbar navbar-light bg-light">
+  <div class="container-fluid">
+    <span class="navbar-brand mb-0 h1">Navbar</span>
+  </div>
+</nav>
+    {% block content %}
+    {% endblock %}
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js" integrity="sha384-q2kxQ16AaE6UbzuKqyBE9/u/KzioAlnx2maXQHiDX9d4/zp8Ok3f+M7DPm+Ib6IU" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-pQQkAEnwaBkjpqZ8RU1fF1AKtTcHJwFl3pblpTlHXybJjHpMYo79HY3hIi4NKxyj" crossorigin="anonymous"></script>
+    -->
+  </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
